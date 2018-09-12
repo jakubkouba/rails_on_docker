@@ -1,0 +1,2 @@
+# Ignore backuped data from containers
+./data/*

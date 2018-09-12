@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:5.6
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${APP_NAME}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${PASSWORD}"
+    restart: always
+    ports:
+      - "${MYSQL_PORT}:3306"  
+
+  ruby:
+    build:
+      context: ./dockerfiles
+      dockerfile: ruby2.5
+    depends_on:
+      - mysql
+    volumes:
+      - ./app:/var/www/app
+      - ./scripts/after_compose.sh:/var/www/app/run.sh
+    environment:
+      USERNAME: "${MYSQL_USER}"
+      HOST: "mysql:${MYSQL_PORT}"
+      PASSWORD: "${PASSWORD}"
+    # command: /var/www/app/run.sh
+    # restart: always
+    ports:
+      - 3000:3000
+
+  
+
