@@ -2,35 +2,39 @@ version: '3.3'
 
 services:
   mysql:
-    image: mysql:5.6
+    image: mysql:5.7
     volumes:
       - ./data/db:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: "${ROOT_PASSWORD}"
-      MYSQL_DATABASE: "${APP_NAME}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
     restart: always
     ports:
-      - "${MYSQL_PORT}:3306"  
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - gcc-net
 
   ruby:
-    build:
-      context: ./dockerfiles
-      dockerfile: ruby2.5
+    image: ruby2.4
+    command: bash run.sh
     depends_on:
       - mysql
     volumes:
-      - ./app:/var/www/app
-      - ./scripts/after_compose.sh:/var/www/app/run.sh
+      - ../:/var/www/app
+      - ./run.sh:/var/www/app/run.sh
     environment:
-      USERNAME: "${MYSQL_USER}"
-      HOST: "mysql:${MYSQL_PORT}"
-      PASSWORD: "${PASSWORD}"
+      DB_USERNAME: root
+      DB_HOST: mysql
+      DB_PORT: "${MYSQL_PORT}"
+      DB_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      APP_NAME: "${APP_NAME}"
     # command: /var/www/app/run.sh
     # restart: always
     ports:
       - 3000:3000
+    networks:
+      - gcc-net
 
+networks:
+  gcc-net:
   
 

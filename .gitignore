@@ -1,3 +1,3 @@
 # Ignore backuped data from containers
-./data/*
+data/*
 .env
